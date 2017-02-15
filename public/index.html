@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>MORPION</title>
+		<style>
+			#tableau{
+				width: 300px;
+			}
+
+			.row{
+				width: 100%;
+			}
+
+			.col{
+				padding-top:100px;
+			}
+
+			.green{
+				background-color: green;
+			}
+
+			.blue,#joueur1{
+				background-color: blue;
+			}
+
+			.red,#joueur2{
+				background-color: red;
+			}
+
+			#joueur1,#joueur2{
+				color:white;
+			}
+		</style>
+	</head>
+	<body>
+		<h2 id="titre"></h2>
+		<span id="joueur1"></span> VS. <span id="joueur2"></span>
+
+		<button id="jouer">Jouer !</button>
+
+		<table id="tableau">
+			<tr class="row" id="row1">
+				<td id="case0" class="col col1 green"></td>
+				<td id="case1" class="col col2 green"></td>
+				<td id="case2" class="col col3 green"></td>
+			</tr>
+			<tr class="row" id="row2">
+				<td id="case3" class="col col1 green"></td>
+				<td id="case4" class="col col2 green"></td>
+				<td id="case5" class="col col3 green"></td>
+			</tr>
+			<tr class="row" id="row3">
+				<td id="case6" class="col col1 green"></td>
+				<td id="case7" class="col col2 green"></td>
+				<td id="case8" class="col col3 green"></td>
+			</tr>
+		</table>
+
+		<script src="/socket.io/socket.io.js"></script> <!-------------------- METTRE NOUVELLE VERSION ---------->
+		<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+		<script type="text/javascript">
+			var socket=io.connect('http://192.168.0.12:8080'); //Mettre a jour IP
+
+			var monTour=true;
+			var spectateur=false;
+			var jeuStop=true;
+			var pseudo=prompt('Choisissez un pseudo :)');
+
+			socket.emit('nouveau_pseudo', pseudo);
+
+			socket.on('peutPasJouer', function(){
+				document.getElementById('titre').innerHTML="Mode spectateur";
+				spectateur=true;
+			});
+
+			socket.on('peutJouer', function(pseudo){
+				if(pseudo==document.getElementById('joueur1').innerHTML){
+					spectateur=false;
+					document.getElementById('titre').innerHTML="Pret a jouer ?";
+				}
+			});
+
+			socket.on('joueur1', function(pseudoMoi){
+				document.getElementById('joueur1').innerHTML=pseudoMoi;
+			});
+
+			$('#jouer').click(function(){
+				if(!spectateur){
+					document.getElementById('titre').innerHTML="Go !";
+					socket.emit('adversaire', pseudo);
+					jeuStop=false;
+					for(var i=0;i<9;i++){
+						if($('#case'+i).hasClass('blue'))
+							$('#case'+i).removeClass('blue');
+						else if($('#case'+i).hasClass('red'))
+							$('#case'+i).removeClass('red');
+						$('#case'+i).addClass('green');
+					}
+				}
+			});
+
+			socket.on('joueur2', function(pseudoAdv){
+				document.getElementById('joueur2').innerHTML=pseudoAdv;
+			});
+
+			socket.on('caseAdversaire', function(infos){
+				monTour=true;
+				$('#case'+infos.numCase).removeClass('green');
+				$('#case'+infos.numCase).addClass('red');
+				if(infos.adversaireWin){
+					jeuStop=true;
+					document.getElementById('titre').innerHTML="Perdu !";
+				}
+			});
+
+			$('#case0').click(function(){
+				if(monTour && !spectateur && !jeuStop)
+					if($('#case0').hasClass('green')){
+						monTour=false;
+						$('#case0').removeClass('green');
+						$('#case0').addClass('blue');
+						if(checkWinner())
+							socket.emit('case', {numCase: '0', winner: true});
+						else
+							socket.emit('case', {numCase: '0', winner: false});
+					}
+			});
+			$('#case1').click(function(){
+				if(monTour && !spectateur && !jeuStop)
+					if($('#case1').hasClass('green')){
+						monTour=false;
+						$('#case1').removeClass('green');
+						$('#case1').addClass('blue');
+						if(checkWinner())
+							socket.emit('case', {numCase: '1', winner: true});
+						else
+							socket.emit('case', {numCase: '1', winner: false});
+					}
+			});
+			$('#case2').click(function(){
+				if(monTour && !spectateur && !jeuStop)
+					if($('#case2').hasClass('green')){
+						monTour=false;
+						$('#case2').removeClass('green');
+						$('#case2').addClass('blue');
+						if(checkWinner())
+							socket.emit('case', {numCase: '2', winner: true});
+						else
+							socket.emit('case', {numCase: '2', winner: false});
+					}
+			});
+			$('#case3').click(function(){
+				if(monTour && !spectateur && !jeuStop)
+					if($('#case3').hasClass('green')){
+						monTour=false;
+						$('#case3').removeClass('green');
+						$('#case3').addClass('blue');
+						if(checkWinner())
+							socket.emit('case', {numCase: '3', winner: true});
+						else
+							socket.emit('case', {numCase: '3', winner: false});
+					}
+			});
+			$('#case4').click(function(){
+				if(monTour && !spectateur && !jeuStop)
+					if($('#case4').hasClass('green')){
+						monTour=false;
+						$('#case4').removeClass('green');
+						$('#case4').addClass('blue');
+						if(checkWinner())
+							socket.emit('case', {numCase: '4', winner: true});
+						else
+							socket.emit('case', {numCase: '4', winner: false});
+					}
+			});
+			$('#case5').click(function(){
+				if(monTour && !spectateur && !jeuStop)
+					if($('#case5').hasClass('green')){
+						monTour=false;
+						$('#case5').removeClass('green');
+						$('#case5').addClass('blue');
+						if(checkWinner())
+							socket.emit('case', {numCase: '5', winner: true});
+						else
+							socket.emit('case', {numCase: '5', winner: false});
+					}
+			});
+			$('#case6').click(function(){
+				if(monTour && !spectateur && !jeuStop)
+					if($('#case6').hasClass('green')){
+						monTour=false;
+						$('#case6').removeClass('green');
+						$('#case6').addClass('blue');
+						if(checkWinner())
+							socket.emit('case', {numCase: '6', winner: true});
+						else
+							socket.emit('case', {numCase: '6', winner: false});
+					}
+			});
+			$('#case7').click(function(){
+				if(monTour && !spectateur && !jeuStop)
+					if($('#case7').hasClass('green')){
+						monTour=false;
+						$('#case7').removeClass('green');
+						$('#case7').addClass('blue');
+						if(checkWinner())
+							socket.emit('case', {numCase: '7', winner: true});
+						else
+							socket.emit('case', {numCase: '7', winner: false});
+					}
+			});
+			$('#case8').click(function(){
+				if(monTour && !spectateur && !jeuStop)
+					if($('#case8').hasClass('green')){
+						monTour=false;
+						$('#case8').removeClass('green');
+						$('#case8').addClass('blue');
+						if(checkWinner())
+							socket.emit('case', {numCase: '8', winner: true});
+						else
+							socket.emit('case', {numCase: '8', winner: false});
+					}
+			});
+
+			checkWinner = function(){
+				var win=false;
+
+				if($('#case0').hasClass('blue') && $('#case1').hasClass('blue') && $('#case2').hasClass('blue'))
+					win=true;
+				else if($('#case3').hasClass('blue') && $('#case4').hasClass('blue') && $('#case5').hasClass('blue'))
+					win=true;
+				else if($('#case6').hasClass('blue') && $('#case7').hasClass('blue') && $('#case8').hasClass('blue'))
+					win=true;
+				else if($('#case0').hasClass('blue') && $('#case3').hasClass('blue') && $('#case6').hasClass('blue'))
+					win=true;
+				else if($('#case1').hasClass('blue') && $('#case4').hasClass('blue') && $('#case7').hasClass('blue'))
+					win=true;
+				else if($('#case2').hasClass('blue') && $('#case5').hasClass('blue') && $('#case8').hasClass('blue'))
+					win=true;
+				else if($('#case0').hasClass('blue') && $('#case4').hasClass('blue') && $('#case8').hasClass('blue'))
+					win=true;
+				else if($('#case2').hasClass('blue') && $('#case4').hasClass('blue') && $('#case6').hasClass('blue'))
+					win=true;
+
+				if(win){
+					jeuStop=true;
+					document.getElementById('titre').innerHTML="Bravo !";
+				}
+
+				return win;
+			}
+		</script>
+	</body>
+</html>
